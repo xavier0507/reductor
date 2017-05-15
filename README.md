@@ -1,3 +1,8 @@
+I rewrite this library to [Elm architecture](https://guide.elm-lang.org/architecture/).  
+For usage, please check example1.  
+example2 contains async operation, but it will fail due that I hide the request url.  
+I will update example2 as soon as possible.
+
 # Reductor: Redux for Android
 
 [![Download](https://api.bintray.com/packages/yarikx/Reductor/Reductor/images/download.svg)](https://bintray.com/yarikx/Reductor/Reductor/_latestVersion)
