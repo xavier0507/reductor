@@ -50,7 +50,7 @@ public class ApplicationModule {
     @Provides
     AppStateReducer provideReducer() {
         return AppStateReducer.builder()
-                .homeDataReducer(HomeReducer.create())
+                .addReducer(HomeReducer.create())
                 .build();
     }
 
