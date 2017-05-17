@@ -34,8 +34,8 @@ public class ReductorApp extends Application {
         super.onCreate();
 
         final AppStateReducer vanillaReducer = AppStateReducer.builder()
-                .notesReducer(NotesListReducer.create())
-                .filterReducer(NotesFilterReducer.create())
+                .addReducer(NotesListReducer.create())
+                .addReducer(NotesFilterReducer.create())
                 .build();
         store = Store.create(
                 new SetStateReducer<>(new UndoableReducer<>(vanillaReducer)),

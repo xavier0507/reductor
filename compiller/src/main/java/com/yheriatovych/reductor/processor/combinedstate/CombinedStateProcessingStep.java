@@ -143,44 +143,44 @@ public class CombinedStateProcessingStep implements BasicAnnotationProcessor.Pro
         MethodSpec.Builder constructorBuilder = MethodSpec.constructorBuilder()
                 .addModifiers(Modifier.PRIVATE);
 
-        for (StateProperty property : properties) {
-            String reducerFieldName = property.name + REDUCER_SUFFIX;
-            TypeName subReducerType = property.getReducerInterfaceTypeName();
-            FieldSpec subReducerField = FieldSpec.builder(
-                    reducerTypeName, reducerFieldName, Modifier.PRIVATE, Modifier.FINAL
-            ).build();
-            reducerFields.add(subReducerField);
+        String LIST_OF_REDUCER_NAME = "reducers";
+        ClassName list = ClassName.get("java.util", "List");
+        ClassName arrayList = ClassName.get("java.util", "ArrayList");
+        TypeName listOfReducerType = ParameterizedTypeName.get(list, reducerTypeName);
 
-            constructorBuilder.addParameter(reducerTypeName, reducerFieldName)
-                    .addStatement("this.$N = $N", reducerFieldName, reducerFieldName);
-        }
+        FieldSpec subReducerField = FieldSpec.builder(
+                listOfReducerType, LIST_OF_REDUCER_NAME, Modifier.PRIVATE
+        ).initializer("new $T<>()", arrayList).build();
+        reducerFields.add(subReducerField);
+
+        constructorBuilder.addParameter(listOfReducerType, LIST_OF_REDUCER_NAME)
+                .addStatement("this.$N = $N", LIST_OF_REDUCER_NAME, LIST_OF_REDUCER_NAME);
 
         MethodTypeInfo mdInfo = StateProperty.getReduceMethodInfo();
+        TypeName pairType2 = TypeName.get(mdInfo.getGenericsInReturnType()[1]); // Commands
 
         // Pair<AppState, Commands>
         final TypeName reducerReturnTypeName = ParameterizedTypeName.get(
                 ClassName.get((Class<?>) ((ParameterizedType)mdInfo.getGenericReturnType()).getRawType()),
                 TypeName.get(combinedStateElement.stateTypeElement.asType()),
-                TypeName.get(mdInfo.getGenericsInReturnType()[1])
+                pairType2
         );
 
-        CodeBlock dispatchingBlockBuilder = reduce(
-                properties,
-                Pair.create(CodeBlock.builder(), stateParam),
-                new Utils.Func2<Pair<CodeBlock.Builder, String>, StateProperty, Pair<CodeBlock.Builder, String>>() {
-            @Override
-            public Pair<CodeBlock.Builder, String> call(Pair<CodeBlock.Builder, String> pair, StateProperty property) {
-                String reducerFieldName = property.name + REDUCER_SUFFIX;
-                String returnFieldName = property.name + "Next";
-                return Pair.create(
-                        pair.first.addStatement(
-                                "$T $N = $N.reduce($N, action)",
-                                reducerReturnTypeName, returnFieldName, reducerFieldName, pair.second
-                        ),
-                        returnFieldName + ".first"
-                );
-            }
-        }).first.build();
+        TypeName listOfPairType2 = ParameterizedTypeName.get(list, pairType2);
+        String REDUCER_NAME = "reducer";
+        String PAIR_NAME = "pair";
+        String PAIR_TYPE2_NAME = "cmds";
+
+        CodeBlock dispatchingBlockBuilder = CodeBlock.builder()
+                .addStatement("final $T $N = new $T<>()", listOfPairType2, PAIR_TYPE2_NAME, arrayList)
+                .beginControlFlow("for ($T $N : $N)", reducerTypeName, REDUCER_NAME, LIST_OF_REDUCER_NAME)
+                .addStatement("$T $N = $N.reduce($N, action)", reducerReturnTypeName, PAIR_NAME, REDUCER_NAME, stateParam)
+                .addStatement("$N = $N.first", stateParam, PAIR_NAME)
+                .beginControlFlow("if ($N.second != null)", PAIR_NAME)
+                .addStatement("$N.add($N.second)", PAIR_TYPE2_NAME, PAIR_NAME)
+                .endControlFlow()
+                .endControlFlow()
+                .build();
 
         // only 'Pair'
         Type reducerReturnTypeWithoutGeneric = mdInfo.getReturnType();
@@ -192,7 +192,7 @@ public class CombinedStateProcessingStep implements BasicAnnotationProcessor.Pro
                 .addParameter(reducerActionType, actionParam)
                 .addCode(dispatchingBlockBuilder).addCode("\n")
                 .addCode(CombinedStateProcessingStep.emitReturnBlock(
-                        reducerReturnTypeWithoutGeneric, properties
+                        reducerReturnTypeWithoutGeneric, stateParam, PAIR_TYPE2_NAME
                 ))
                 .build();
 
@@ -231,15 +231,12 @@ public class CombinedStateProcessingStep implements BasicAnnotationProcessor.Pro
         javaFile.writeTo(env.getFiler());
     }
 
-    private static CodeBlock emitReturnBlock(Type returnType, List<StateProperty> properties) {
+    private static CodeBlock emitReturnBlock(Type returnType, String stateParam, String PAIR_TYPE2_NAME) {
         CodeBlock.Builder runCommands = CodeBlock.builder();
-        for (StateProperty property : properties) {
-            String propertyName = property.name + "Next";
-            runCommands
-                    .beginControlFlow("if ($N.second != null)", propertyName)
-                    .addStatement("$N.second.run(store)", propertyName)
-                    .endControlFlow();
-        }
+        runCommands
+                .beginControlFlow("for ($T cmd : $N)", Commands.class, PAIR_TYPE2_NAME)
+                .addStatement("cmd.run(store)")
+                .endControlFlow();
 
         TypeSpec commands = TypeSpec.anonymousClassBuilder("")
                 .addSuperinterface(ParameterizedTypeName.get(Commands.class))
@@ -254,7 +251,7 @@ public class CombinedStateProcessingStep implements BasicAnnotationProcessor.Pro
         return CodeBlock.builder()
                 .addStatement("return $T.create($N, $L)",
                         returnType,
-                        properties.get(properties.size()-1).name + "Next.first",
+                        stateParam,
                         commands
                 ).build();
     }
@@ -272,39 +269,31 @@ public class CombinedStateProcessingStep implements BasicAnnotationProcessor.Pro
                 .addModifiers(Modifier.PRIVATE)
                 .build());
 
-        for (StateProperty property : combinedStateElement.properties) {
-            String name = property.name + REDUCER_SUFFIX;
-            FieldSpec field = FieldSpec.builder(reducerTypeName, name, Modifier.PRIVATE)
-                    .build();
+        String REDUCER_NAME = "reducer";
+        String LIST_OF_REDUCER_NAME = "reducers";
+        ClassName list = ClassName.get("java.util", "List");
+        ClassName arrayList = ClassName.get("java.util", "ArrayList");
+        TypeName listOfReducerType = ParameterizedTypeName.get(list, reducerTypeName);
 
-            MethodSpec setter = MethodSpec.methodBuilder(name)
-                    .addModifiers(Modifier.PUBLIC)
-                    .returns(builderClassName)
-                    .addParameter(reducerTypeName, name)
-                    .addStatement("this.$N = $N", name, name)
-                    .addStatement("return this")
-                    .build();
+        FieldSpec field = FieldSpec.builder(
+                listOfReducerType, LIST_OF_REDUCER_NAME, Modifier.PRIVATE
+        ).initializer("new $T<>()", arrayList).build();
 
-            builder.addField(field);
-            builder.addMethod(setter);
-        }
+        MethodSpec setter = MethodSpec.methodBuilder("addReducer")
+                .addModifiers(Modifier.PUBLIC)
+                .returns(builderClassName)
+                .addParameter(reducerTypeName, REDUCER_NAME)
+                .addStatement("$N.add($N)", LIST_OF_REDUCER_NAME, REDUCER_NAME)
+                .addStatement("return this")
+                .build();
+
+        builder.addField(field);
+        builder.addMethod(setter);
 
         MethodSpec.Builder buildMethodBuilder = MethodSpec.methodBuilder("build")
                 .addModifiers(Modifier.PUBLIC)
                 .returns(combinedReducerClassName);
-
-        ClassName exception = ClassName.get(IllegalStateException.class);
-        StringBuilder constructorArgs = new StringBuilder();
-        for (StateProperty property : combinedStateElement.properties) {
-            String name = property.name + REDUCER_SUFFIX;
-            buildMethodBuilder.beginControlFlow("if ($N == null)", name);
-            buildMethodBuilder.addStatement("throw new $T($S)", exception, name + " should not be null");
-            buildMethodBuilder.endControlFlow();
-
-            if (constructorArgs.length() != 0) constructorArgs.append(", ");
-            constructorArgs.append(name);
-        }
-        buildMethodBuilder.addStatement("return new $T(" + constructorArgs.toString() + ")", combinedReducerClassName);
+        buildMethodBuilder.addStatement("return new $T(" + LIST_OF_REDUCER_NAME + ")", combinedReducerClassName);
 
         builder.addMethod(buildMethodBuilder.build());
 
