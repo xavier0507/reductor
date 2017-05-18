@@ -10,23 +10,23 @@ import java.util.List;
 import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 
-public class EpicCommands<T> implements Commands<T>, Disposable {
+public class EpicCommands<S, T> implements Commands<S>, Disposable {
 
-    private List<Observable<Object>> tasks;
+    private List<Observable<T>> tasks;
     private Disposable disposable;
 
-    private EpicCommands(List<Observable<Object>> tasks) {this.tasks = tasks; }
+    private EpicCommands(List<Observable<T>> tasks) {this.tasks = tasks; }
 
-    public static <T> EpicCommands<T> create(List<Observable<Object>> list) {
+    public static <S, T> EpicCommands<S, T> create(List<Observable<T>> list) {
         return new EpicCommands<>(list);
     }
 
-    public static <T> EpicCommands<T> create(Observable<Object> task) {
+    public static <S, T> EpicCommands<S, T> create(Observable<T> task) {
         return create(Arrays.asList(task));
     }
 
     @Override
-    public void run(Store<T> store) {
+    public void run(Store<S> store) {
         if (tasks == null) return;
 
         // TODO check this
