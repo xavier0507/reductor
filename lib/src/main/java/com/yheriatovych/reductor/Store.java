@@ -36,7 +36,7 @@ public class Store<State> implements Dispatcher, Cursor<State> {
         if (actionObject instanceof Action) {
             final Action action = (Action) actionObject;
             synchronized (this) {
-                Pair<State, Commands> pair = reducer.reduce(state, action);
+                Pair<State, Commands<State>> pair = reducer.reduce(state, action);
                 state = pair.first;
                 Commands cmd = pair.second;
                 if (cmd != null) {

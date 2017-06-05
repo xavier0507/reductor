@@ -69,12 +69,16 @@ public class AutoReducerProcessingStep implements BasicAnnotationProcessor.Proce
         TypeName stateTypeName = TypeName.get(reducerElement.stateType);
         MethodTypeInfo mdInfo = StateProperty.getReduceMethodInfo();
 
-        // type `Pair<AppState, Commands>`
+        // type `Pair<AppState, Commands<AppState>`
         final TypeName reducerReturnTypeName = ParameterizedTypeName.get(
                 ClassName.get((Class<?>) ((ParameterizedType)mdInfo.getGenericReturnType())
                         .getRawType()),
                 stateTypeName,
-                TypeName.get(mdInfo.getGenericsInReturnType()[1])
+                ParameterizedTypeName.get(
+                        ClassName.get((Class<?>) ((ParameterizedType)mdInfo.getGenericsInReturnType()[1])
+                                .getRawType()),
+                        stateTypeName
+                )
         );
 
         MethodSpec.Builder reduceMethodBuilder = MethodSpec.methodBuilder("reduce")

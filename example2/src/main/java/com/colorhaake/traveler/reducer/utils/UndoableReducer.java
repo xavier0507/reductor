@@ -28,7 +28,7 @@ public class UndoableReducer<State> implements Reducer<State> {
     }
 
     @Override
-    public Pair<State, Commands> reduce(State state, Action action) {
+    public Pair<State, Commands<State>> reduce(State state, Action action) {
         if (action.type.equals("POP")) {
             return stack.isEmpty()
                     ? Pair.create(state)

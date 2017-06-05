@@ -157,7 +157,14 @@ public class CombinedStateProcessingStep implements BasicAnnotationProcessor.Pro
                 .addStatement("this.$N = $N", LIST_OF_REDUCER_NAME, LIST_OF_REDUCER_NAME);
 
         MethodTypeInfo mdInfo = StateProperty.getReduceMethodInfo();
-        TypeName pairType2 = TypeName.get(mdInfo.getGenericsInReturnType()[1]); // Commands
+        // AppState
+        TypeName pairType1 = TypeName.get(combinedStateElement.stateTypeElement.asType());
+        // Commands<AppState>
+        TypeName pairType2 = ParameterizedTypeName.get(
+                ClassName.get((Class<?>) ((ParameterizedType)mdInfo.getGenericsInReturnType()[1])
+                        .getRawType()),
+                pairType1
+        );
 
         // Pair<AppState, Commands>
         final TypeName reducerReturnTypeName = ParameterizedTypeName.get(
