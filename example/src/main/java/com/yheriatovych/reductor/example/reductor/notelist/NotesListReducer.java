@@ -16,7 +16,7 @@ public abstract class NotesListReducer implements Reducer<AppState> {
 
     @Action(value = NotesActions.ADD_ACTION,
             from = NotesActions.class)
-    public Pair<AppState, Commands> add(AppState state, int id, String content) {
+    public Pair<AppState, Commands<AppState>> add(AppState state, int id, String content) {
         return Pair.create(state.withNotes(
                 TreePVector.from(state.notes()).plus(new Note(id, content, false))
         ));
@@ -24,7 +24,7 @@ public abstract class NotesListReducer implements Reducer<AppState> {
 
     @Action(value = NotesActions.TOGGLE,
             from = NotesActions.class)
-    public Pair<AppState, Commands> toggle(AppState state, int noteId) {
+    public Pair<AppState, Commands<AppState>> toggle(AppState state, int noteId) {
         List<Note> notes = state.notes();
         for (int i = 0; i < notes.size(); i++) {
             Note note = notes.get(i);
@@ -39,7 +39,7 @@ public abstract class NotesListReducer implements Reducer<AppState> {
 
     @Action(value = NotesActions.REMOVE_ITEM,
             from = NotesActions.class)
-    public Pair<AppState, Commands> remove(AppState state, int id) {
+    public Pair<AppState, Commands<AppState>> remove(AppState state, int id) {
         List<Note> notes = state.notes();
         for (int i = 0, notesSize = notes.size(); i < notesSize; i++) {
             Note note = notes.get(i);

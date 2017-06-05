@@ -12,7 +12,7 @@ import com.yheriatovych.reductor.example.model.NotesFilter;
 public abstract class NotesFilterReducer implements Reducer<AppState> {
     @Action(value = FilterActions.SET_FILTER,
             from = FilterActions.class)
-    Pair<AppState, Commands> setFilter(AppState state, NotesFilter value) {
+    Pair<AppState, Commands<AppState>> setFilter(AppState state, NotesFilter value) {
         return Pair.create(state.withFilter(value));
     }
 

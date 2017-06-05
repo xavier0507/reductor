@@ -30,7 +30,7 @@ public abstract class HomeReducer implements Reducer<AppState> {
             value = HomeActions.VIEW_READY,
             from = HomeActions.class
     )
-    public Pair<AppState, Commands> viewReady(AppState state, Context context) {
+    public Pair<AppState, Commands<AppState>> viewReady(AppState state, Context context) {
         return Pair.create(state, EpicCommands.create((
                 ObservableFactory.from(
                         SmartLocation.with(context).location()
@@ -48,7 +48,7 @@ public abstract class HomeReducer implements Reducer<AppState> {
             value = HomeActions.FETCH_HOME_DATA_RES,
             from = HomeActions.class
     )
-    public Pair<AppState, Commands> fetchHomeDataRes(AppState state, Response<HomeData> res) {
+    public Pair<AppState, Commands<AppState>> fetchHomeDataRes(AppState state, Response<HomeData> res) {
         if (!res.error.code.isEmpty()) {
             return Pair.create(state);
         }
