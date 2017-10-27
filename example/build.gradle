@@ -1,10 +1,8 @@
 apply plugin: 'com.android.application'
-apply plugin: 'me.tatarka.retrolambda'
-apply plugin: 'com.neenbedankt.android-apt'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion '25.0.0'
+    buildToolsVersion '26.0.2'
 
     defaultConfig {
         applicationId "com.yheriatovych.reductor.example"
@@ -30,12 +28,8 @@ android {
     }
 }
 
-retrolambda {
-    defaultMethods true
-}
-
 dependencies {
-    apt project(':compiller')
+    annotationProcessor project(':compiller')
     compile project(':lib')
     compile project(':reductor-rxjava')
 
@@ -49,7 +43,7 @@ dependencies {
     compile 'com.facebook.stetho:stetho-js-rhino:1.3.1'
     compile 'com.google.code.gson:gson:2.7'
     provided "com.google.auto.value:auto-value:${autoValueVersion}"
-    apt "com.google.auto.value:auto-value:${autoValueVersion}"
+    annotationProcessor "com.google.auto.value:auto-value:${autoValueVersion}"
     provided 'com.ryanharter.auto.value:auto-value-gson:0.4.2'
-    apt 'com.ryanharter.auto.value:auto-value-gson:0.4.2'
+    annotationProcessor 'com.ryanharter.auto.value:auto-value-gson:0.4.2'
 }
