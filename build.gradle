@@ -3,9 +3,9 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.2'
+        classpath 'com.android.tools.build:gradle:3.1.0'
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
-        classpath 'me.tatarka:gradle-retrolambda:3.3.0'
+        classpath 'me.tatarka:gradle-retrolambda:3.6.1'
     }
 }
 
@@ -15,7 +15,6 @@ project.ext {
     reductorVersion = '0.14.0'
 
     retrolambdaVersion = '2.5.1'
-    autoValueVersion = '1.4.1'
 }
 
 

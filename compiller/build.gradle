@@ -7,8 +7,8 @@ targetCompatibility = JavaVersion.VERSION_1_7
 dependencies {
     compile project(':lib')
 
-    compile 'com.squareup:javapoet:1.7.0'
-    compile 'com.google.auto.service:auto-service:1.0-rc2'
+    compile 'com.squareup:javapoet:1.9.0'
+    compile 'com.google.auto.service:auto-service:1.0-rc3'
     compile 'com.google.auto:auto-common:0.8'
 
     compileOnly "com.google.auto.value:auto-value:${autoValueVersion}"
