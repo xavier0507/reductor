@@ -17,6 +17,7 @@ import dagger.Provides;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 
+// FIXME Has kapt compile issue when convert this file into kotlin
 @Module
 public class ApplicationModule {
     protected final Application mApplication;

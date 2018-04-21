@@ -2,12 +2,16 @@ package javatest.colorhaake.com.example3.view.main
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.LinearLayoutManager
 
 import javatest.colorhaake.com.example3.R
 import javatest.colorhaake.com.example3.Example3App
 import javatest.colorhaake.com.example3.injection.component.ActivityComponent
 import javatest.colorhaake.com.example3.injection.component.DaggerActivityComponent
 import javatest.colorhaake.com.example3.injection.module.ActivityModule
+import javatest.colorhaake.com.example3.model.ImageData
+import javatest.colorhaake.com.example3.model.Response
+import kotlinx.android.synthetic.main.activity_main.*
 
 import javax.inject.Inject
 
@@ -15,6 +19,10 @@ class MainActivity : AppCompatActivity(), MainMvpView {
 
     @Inject
     lateinit var mMainPresenter: MainPresenter
+
+    private val adapter: MainAdapter by lazy {
+        MainAdapter()
+    }
 
     private val component: ActivityComponent by lazy {
         DaggerActivityComponent.builder()
@@ -29,18 +37,26 @@ class MainActivity : AppCompatActivity(), MainMvpView {
 
         component.inject(this)
 
+        recycler_view.adapter = adapter
+        recycler_view.layoutManager = LinearLayoutManager(this)
+
         mMainPresenter.attachView(this)
-        mMainPresenter.viewReady(this)
+        mMainPresenter.viewReady()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    private fun onSeachTextChange(term: String) {
+        mMainPresenter.searchImages(term, 1)
+    }
 
+    override fun onStop() {
+        super.onStop()
         mMainPresenter.detachView()
     }
 
 
     /***** MVP View methods implementation  */
 
-    override fun showMainPage(list: List<String>) {}
+    override fun showMainPage(searchImageData: Response<ImageData>) {
+        adapter.updateSearchImageData(searchImageData, ::onSeachTextChange)
+    }
 }

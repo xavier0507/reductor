@@ -19,22 +19,22 @@ class ActivityModule(private val mActivity: Activity) {
 
     @Provides
     @ActivityContext
-    internal fun provideContext(): Context {
+    fun provideContext(): Context {
         return mActivity
     }
 
     @Provides
-    internal fun provideActivity(): Activity {
+    fun provideActivity(): Activity {
         return mActivity
     }
 
     @Provides
-    internal fun provideMainActions(): MainActions {
+    fun provideMainActions(): MainActions {
         return Actions.from(MainActions::class.java)
     }
 
     @Provides
-    internal fun providePresenter(
+    fun providePresenter(
             state: Observable<AppState>, store: Store<AppState>, actions: MainActions
     ): MainPresenter {
         return MainPresenter(state, store, actions)

@@ -10,6 +10,7 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 
 import javatest.colorhaake.com.example3.Config.API_KEY
+import javatest.colorhaake.com.example3.model.ImageData
 
 object NetworkApi {
     private val retrofit: Retrofit by lazy {
@@ -25,7 +26,7 @@ object NetworkApi {
         retrofit.create(Example3Service::class.java)
     }
 
-    fun searchData(term: String): Observable<Response<String>> {
-        return service.searchData(API_KEY, term)
+    fun searchData(term: String, page: Int): Observable<Response<ImageData>> {
+        return service.searchData(API_KEY, term, page)
     }
 }
