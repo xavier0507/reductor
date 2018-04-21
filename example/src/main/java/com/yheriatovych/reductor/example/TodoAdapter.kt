@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import com.yheriatovych.reductor.example.model.Note
-import rx.functions.Action1
 
 class TodoAdapter(
         private var notes: List<Note>,

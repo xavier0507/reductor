@@ -2,7 +2,6 @@ package com.yheriatovych.reductor.example
 
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
-import rx.functions.Action1
 
 internal class NoteTouchCallback(
         private val onDismissed: (Int) -> Unit
