@@ -45,7 +45,7 @@ public abstract class AppState {
         NotesFilter filter = this.filter();
         return Utils.filter(ConsPStack.from(notes), note ->
                 filter == NotesFilter.ALL
-                        || filter == NotesFilter.CHECKED && note.checked
-                        || filter == NotesFilter.UNCHECKED && !note.checked);
+                        || filter == NotesFilter.CHECKED && note.getChecked()
+                        || filter == NotesFilter.UNCHECKED && !note.getChecked());
     }
 }
