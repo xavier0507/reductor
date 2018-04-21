@@ -39,7 +39,7 @@ public class ApplicationModule {
     @Provides
     AppStateReducer provideReducer() {
         return AppStateReducer.builder()
-                .addReducer(MainReducer.create())
+                .addReducer(MainReducer.Companion.create())
                 .build();
     }
 
@@ -48,7 +48,7 @@ public class ApplicationModule {
     Store<AppState> provideStore(AppStateReducer reducer) {
         return Store.create(
                 reducer,
-                AppState.initState()
+                AppState.Companion.initState()
         );
     }
 

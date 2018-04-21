@@ -1,12 +1,12 @@
-package javatest.colorhaake.com.example3.view.base;
+package javatest.colorhaake.com.example3.view.base
 
 /**
  * Every presenter in the app must either implement this interface or extend BasePresenter
  * indicating the MvpView type that wants to be attached with.
  */
-public interface Presenter<V extends MvpView> {
+interface Presenter<in V : MvpView> {
 
-    void attachView(V mvpView);
+    fun attachView(mvpView: V)
 
-    void detachView();
+    fun detachView()
 }
