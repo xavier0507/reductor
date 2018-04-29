@@ -24,28 +24,24 @@ import retrofit2.Call
 import retrofit2.CallAdapter
 
 class RxJava2CallAdapterWithErrorInterceptor<R> internal constructor(
-        private val callAdapter: CallAdapter<R, *>, private val isBody: Boolean
-) : CallAdapter<R, Any> {
+        private val callAdapter: CallAdapter<R, Observable<Response<*>>>, private val isBody: Boolean
+) : CallAdapter<R, Observable<Response<*>>> {
 
     override fun responseType(): Type = callAdapter.responseType()
 
-    override fun adapt(call: Call<R>): Any {
+    override fun adapt(call: Call<R>): Observable<Response<*>> {
         val type = callAdapter.adapt(call)
-        return if (isBody && type is Observable<*>) {
+        return if (isBody) {
             type.map { res ->
-                if (res is Response<*>) {
                     res.copy(
                             _metadata = Metadata(Metadata.TYPE_NORMAL, HttpURLConnection.HTTP_OK, "", "")
                     )
-                } else {
-                    res
                 }
-            }
                     .onErrorResumeNext(::handleException)
         } else type
     }
 
-    private fun handleException(t: Throwable): Observable<out Any> {
+    private fun handleException(t: Throwable): Observable<out Response<*>> {
         return if (t is retrofit2.HttpException) {
             try {
                 val res = t.response()
@@ -68,7 +64,7 @@ class RxJava2CallAdapterWithErrorInterceptor<R> internal constructor(
             } catch (e: JsonSyntaxException) {
                 Observable.just(Response.defaultHttpExceptionInstance)
             }
-        } else if (shouldHandleException(t)) {
+        } else {
             val metaType = convertExceptionToMetaType(t)
             Observable.just(Response<Any>(
                     0,
@@ -76,19 +72,7 @@ class RxJava2CallAdapterWithErrorInterceptor<R> internal constructor(
                     listOf(),
                     Metadata(metaType, HttpStatusCode.INVALID, "", "")
             ))
-        } else {
-            Observable.just(t)
         }
-    }
-
-    private fun shouldHandleException(t: Throwable): Boolean {
-        return (t is UnknownHostException
-                || t is ConnectException
-                || t is SocketTimeoutException
-                || t is SocketException
-                || t is SSLHandshakeException
-                || t is SSLException
-                || t is IOException)
     }
 
     private fun convertExceptionToMetaType(t: Throwable): Int {

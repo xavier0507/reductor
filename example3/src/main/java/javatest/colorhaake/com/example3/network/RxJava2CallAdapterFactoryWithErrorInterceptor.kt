@@ -1,5 +1,6 @@
 package javatest.colorhaake.com.example3.network
 
+import io.reactivex.Observable
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
@@ -20,15 +21,17 @@ class RxJava2CallAdapterFactoryWithErrorInterceptor private constructor(
         else -> RxJava2CallAdapterFactory.create()
     }
 
+    @Suppress("UNCHECKED_CAST")
     override fun get(
             returnType: Type, annotations: Array<Annotation>, retrofit: Retrofit
     ): CallAdapter<*, *>? {
-        val observableType = CallAdapter.Factory.getParameterUpperBound(0, returnType as ParameterizedType)
-        val rawObservableType = CallAdapter.Factory.getRawType(observableType)
+        val observableType = getParameterUpperBound(0, returnType as ParameterizedType)
+        val rawObservableType = getRawType(observableType)
         val isBody = rawObservableType != Response::class.java
                 && rawObservableType != Result::class.java
 
         val callAdapter = adapterFactory.get(returnType, annotations, retrofit)
+                as? CallAdapter<*, Observable<javatest.colorhaake.com.example3.model.Response<*>>>
         return callAdapter?.let { RxJava2CallAdapterWithErrorInterceptor(it, isBody) }
     }
 
