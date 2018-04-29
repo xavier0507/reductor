@@ -16,7 +16,11 @@ object NetworkApi {
     private val retrofit: Retrofit by lazy {
         Retrofit.Builder()
                 .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
+                .addCallAdapterFactory(
+                        RxJava2CallAdapterFactoryWithErrorInterceptor.createWithScheduler(
+                                Schedulers.io()
+                        )
+                )
                 .client(RetrofitUtil.genericClient())
                 .baseUrl(Config.BASE_API_URL)
                 .build()

@@ -35,7 +35,7 @@ class MainPresenter(
                 .subscribe { mvpView?.showMainPage(it) }
                 .let(disposables::add)
 
-        searchImagesSubject.sample(10, TimeUnit.SECONDS)
+        searchImagesSubject.sample(1, TimeUnit.SECONDS)
                 .subscribe { (term, page) ->
                     store.dispatch(actions.searchImages(term, page))
                 }

@@ -37,6 +37,10 @@ abstract class MainReducer : Reducer<AppState> {
 
     @AutoReducer.Action(value = MainActions.SEARCH_IMAGES_RES, from = MainActions::class)
     fun searchImagesRes(state: AppState, res: Response<ImageData>): Pair<AppState, Commands<AppState>> {
+        if (res.metadata.isNotSuccess) {
+            return Pair.create(state)
+        }
+
         return Pair.create(state.withSearchImageData(res))
     }
 

@@ -27,7 +27,7 @@ abstract class AppState {
 
         fun initState(): AppState {
             return builder()
-                    .setSearchImageData(Response(0, 0, listOf()))
+                    .setSearchImageData(Response(0, 0, listOf(), null))
                     .build()
         }
     }
