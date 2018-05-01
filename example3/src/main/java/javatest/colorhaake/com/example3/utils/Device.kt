@@ -1,4 +1,4 @@
-package javatest.colorhaake.com.example3.util
+package javatest.colorhaake.com.example3.utils
 
 import android.content.res.Resources
 

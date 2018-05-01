@@ -9,7 +9,7 @@ import com.hannesdorfmann.adapterdelegates3.AbsListItemAdapterDelegate
 import javatest.colorhaake.com.example3.R
 import javatest.colorhaake.com.example3.extension.setSize
 import javatest.colorhaake.com.example3.model.ImageData
-import javatest.colorhaake.com.example3.util.getScreenWidth
+import javatest.colorhaake.com.example3.utils.getScreenWidth
 import kotlinx.android.synthetic.main.item_image.view.*
 import kotlinx.android.synthetic.main.item_search_images.view.*
 
