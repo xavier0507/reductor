@@ -11,8 +11,11 @@ import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.Result
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 
-class RxJava2CallAdapterFactoryWithErrorInterceptor private constructor(
-        scheduler: Scheduler?, isAsync: Boolean
+class RxJava2CallAdapterFactoryWithErrorInterceptor<T> private constructor(
+        scheduler: Scheduler?,
+        isAsync: Boolean,
+        private val onSuccess: ((T) -> T)? = null,
+        private val onError: ((Throwable, Type) -> T)? = null
 ) : CallAdapter.Factory() {
 
     private val adapterFactory: RxJava2CallAdapterFactory = when {
@@ -31,21 +34,37 @@ class RxJava2CallAdapterFactoryWithErrorInterceptor private constructor(
                 && rawObservableType != Result::class.java
 
         val callAdapter = adapterFactory.get(returnType, annotations, retrofit)
-                as? CallAdapter<*, Observable<javatest.colorhaake.com.example3.model.Response<*>>>
-        return callAdapter?.let { RxJava2CallAdapterWithErrorInterceptor(it, isBody) }
+                as? CallAdapter<*, Observable<T>>
+
+        return callAdapter?.let {
+            RxJava2CallAdapterWithErrorInterceptor(it, isBody, onSuccess, onError)
+        }
     }
 
     companion object {
-        fun create(): RxJava2CallAdapterFactoryWithErrorInterceptor {
-            return RxJava2CallAdapterFactoryWithErrorInterceptor(null, false)
-        }
+        fun <T> create(
+                mapOnSuccess: ((T) -> T)? = null,
+                mapOnError: ((Throwable, Type) -> T)? = null
+        ): RxJava2CallAdapterFactoryWithErrorInterceptor<T> =
+                RxJava2CallAdapterFactoryWithErrorInterceptor(
+                        null, false, mapOnSuccess, mapOnError
+                )
 
-        fun createAsync(): RxJava2CallAdapterFactoryWithErrorInterceptor {
-            return RxJava2CallAdapterFactoryWithErrorInterceptor(null, true)
-        }
+        fun <T> createAsync(
+                mapOnSuccess: ((T) -> T)? = null,
+                mapOnError: ((Throwable, Type) -> T)? = null
+        ): RxJava2CallAdapterFactoryWithErrorInterceptor<T> =
+                RxJava2CallAdapterFactoryWithErrorInterceptor(
+                        null, true, mapOnSuccess, mapOnError
+                )
 
-        fun createWithScheduler(scheduler: Scheduler): RxJava2CallAdapterFactoryWithErrorInterceptor {
-            return RxJava2CallAdapterFactoryWithErrorInterceptor(scheduler, false)
-        }
+        fun <T> createWithScheduler(
+                scheduler: Scheduler,
+                mapOnSuccess: ((T) -> T)? = null,
+                mapOnError: ((Throwable, Type) -> T)? = null
+        ): RxJava2CallAdapterFactoryWithErrorInterceptor<T> =
+                RxJava2CallAdapterFactoryWithErrorInterceptor(
+                        scheduler, false, mapOnSuccess, mapOnError
+                )
     }
 }
