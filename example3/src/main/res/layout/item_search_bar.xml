@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp">
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/input_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <javatest.colorhaake.com.example3.view.utils.ClearableEditText
+            android:id="@+id/edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:drawableStart="@drawable/ic_search_black"
+            android:drawablePadding="28dp"
+            android:drawableEnd="@drawable/ic_clear_black"
+            android:textColorHint="@android:color/black" />
+
+    </android.support.design.widget.TextInputLayout>
+
+</LinearLayout>
